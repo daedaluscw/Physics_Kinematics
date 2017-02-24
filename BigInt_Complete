@@ -1,0 +1,1056 @@
+/**
+ * 
+ * @author Christopher Wells
+ *CSC 202 Section 001N
+ * 
+ * 	The Goal of the program is to add, subtract, divide and multiply large integers (up to 1000 digit).
+ * 
+ * Program Start: 01/13/2017
+ * 
+ * Program Update: 01/18/2017
+ * 	The Changes to the program were as follows.  
+ * 	1.  The program was ported form the NetBeans IDE to Eclipse to be more compatible with class computers.
+ * 	2.  The toString() method was updated to return a string in the form -454654646556 
+ * 	3.  The methods have been modified to make the program more readable,and easier to maintain
+ *
+ * Program Updated 01/29/2017
+ * 1.  The Add function was added to allow for the addition of two BigInt
+ * 2.  THe Subtract Function was added to allow for the subtraction of two BigInts
+ * 
+ * Program Updated 02/04/2017
+ * 1.  The multiplication function was added and tested.  
+ * 2.  A leading zero issue was corrected in the addition portion of the program.
+ * 3.  Added the integer overloaded functions for the methods.
+ * 
+ * Program Updated 02/11/2017
+ * 1.  Added Overloaded Methods for the Add Method
+ * 2.  Added the Division Method
+ * 
+ * Program Completion 2/16/2017
+ */
+
+import java.util.ArrayList;
+import java.util.AbstractList;
+import java.util.Stack;
+
+
+
+public class BigInt {
+	//Private Class Data
+	//private String enteredString;  //Stores the user entered String, this is here for testing and comparison
+	protected int length = 0;  //Stores the length of the array of integers.
+	private ArrayList<Integer> theBigInt = new ArrayList<Integer>();
+	private ArrayList<Integer> tempInt = new ArrayList<Integer>();
+	private boolean isPositive = true;
+	
+	private static ArrayList<Integer> count = new ArrayList<Integer>();
+	
+	//Constructors
+	BigInt()
+	{
+		
+	}
+	
+	BigInt( String s)
+	{
+		this.setLength(0);
+		this.setTheBigInt(s);
+	}
+	
+	//Limited the Constructors to two cases.
+	
+	//Accessors
+	//public String getEnteredString()
+	//{
+	//	return enteredString;
+	//}
+	
+	public boolean greaterThan( BigInt b) // a > b
+	{
+		boolean isGreater = true;
+		
+		if ( this.length < b.length)
+		{
+			isGreater = false; //The second number is a larger number by looking at the length
+		}
+		if ( this.length == b.length)
+		{
+			//We can not determine by looking at the lengths which is larger now we have to look in more detail
+			int index = b.length;
+			index--;
+			while ( index >= 0)
+			{
+				//System.out.println("False" + index + " " + this.theBigInt.get(index) + " " + b.theBigInt.get(index));
+				if ( this.theBigInt.get(index) < b.theBigInt.get(index))
+				{
+					isGreater = false; //here is a point where the second number is greater than the first
+					//index = -1; //We know the answer no use in looking further
+					//System.out.println("False" + index + " " + this.theBigInt.get(index) + " " + b.theBigInt.get(index));
+					return isGreater;
+				}
+				if ( this.theBigInt.get(index) > b.theBigInt.get(index))
+				{
+					isGreater = true; //here is a point where the second number is greater than the first
+					//index = -1; //We know the answer no use in looking further
+					//System.out.println("False" + index + " " + this.theBigInt.get(index) + " " + b.theBigInt.get(index));
+					return isGreater;
+				}
+				index--;
+			}
+		}
+		
+		return isGreater;
+	}
+	
+	public int getLength()
+	{
+		return length;
+	}
+	
+	public boolean getIsPositive()
+	{
+		return isPositive;
+	}
+	
+	//Modifiers
+	private void setLength(int i)
+	{
+		this.length = i;
+	}
+	
+	private void incrementCount()
+	{
+		int lengthPassed = this.count.size();  //Stores the length of the passed number
+		int index = 0; //Stores the index we will use as we traverse the two numbers
+		int carry = 0;  //Stores the carry over form the addition
+		int number = 0;  //Stores the number inserted into the new array
+		ArrayList<Integer> temp = new ArrayList<> (); // Create a local array to hold the number 
+		temp.add(1);
+		
+		while ( ( index < lengthPassed) || ( index < temp.size()))
+		{
+			number = carry; // add any carryover from the previous addition
+			if (index < lengthPassed)
+			{  // Check to see if the index ref is a valid location in the array, else skip the array
+				number = number + this.count.get(index);  //Add the element at the nth location of the first array
+			}
+			if ( index < temp.size())
+			{  // Check to see if the index ref is a valid location in the array, else skip the array
+				number = number + temp.get(index);  //Add the element in the nth location
+				
+			}
+			carry = number / 10; //Handle the cases where the addition is larger than 10 ie. 9+9 = 18 
+			//This will be a 1;
+			number = number % 10; // The remainder will be the number we insert into the array.
+			temp.add(number);
+			index++;
+			//System.out.println("Number = " + number + " Carry = " + carry); //Testing the input
+			number = 0;
+			
+		}
+		if ( carry > 0)
+		{
+			temp.add(carry);
+		}
+		//System.out.println(temp.toString()); //Remove Used to add the numbers together by hand and verify input to the class
+		//return temp;
+	}
+	
+	public BigInt subtract( BigInt b)
+	{
+		ArrayList<Integer> product = new ArrayList<Integer> ();
+		String temp ="";
+		boolean sign = true;
+		
+		if ( (this.isPositive) && ( !b.getIsPositive()))
+		{
+			//Handle the cases of additive inverse
+			product = this.addTwoDigits(b.theBigInt); // A - (-B) = A+B
+			sign = true;  
+			
+		}
+		if ((!this.isPositive) && (b.getIsPositive()))
+		{
+			product = this.addTwoDigits(b.theBigInt); // -A-B = -A+(-B)
+			sign = false;
+		}
+		if ( this.greaterThan(b))
+		{
+			product = this.subtractTwoNumbers(this.theBigInt, b.theBigInt);
+			sign = this.getIsPositive();
+		}
+		else
+		{
+			product = this.subtractTwoNumbers(b.theBigInt, this.theBigInt);
+			sign = b.getIsPositive();
+		}
+		
+		//Remove leading Zeros
+		int index = 0;
+		index = product.size() - 1;
+		boolean flag = false; //will indicate the start of the non-zero numbers
+		while ( (index > 0) && (!flag))
+		{
+			if ( ( product.get(index) == 0) && (!flag))
+			{
+				product.remove(index);
+			}
+			else
+			{
+				flag = true;
+			}
+			index--;
+		}
+		
+		temp = this.parseNumberToString(product);
+		BigInt productOfSubtraction = new BigInt(temp);
+		productOfSubtraction.setTheSign(sign);
+		return productOfSubtraction;
+	}
+	
+	public BigInt subtract( int b)
+	{
+		//ArrayList<Integer> product = new ArrayList<Integer> ();
+		String temp ="";
+		boolean sign = true;
+		ArrayList<Integer> convertedInt = new ArrayList<Integer>();
+		convertedInt = this.convertIntToArray(b);
+		temp = this.parseNumberToString(convertedInt);
+		System.out.println("String number = " + temp);
+		BigInt test = new BigInt();
+		if ( b >= 0)
+		{
+			sign = true;
+		}
+		else
+		{
+			sign = false;
+		}
+		
+		BigInt temNumber = new BigInt(temp);
+		temNumber.setTheSign(sign);
+		test = this.subtract(temNumber);
+		return test;
+		
+		
+	}
+	
+	private ArrayList<Integer> subtractTwoNumbers( ArrayList<Integer> a, ArrayList<Integer> b)
+	{
+		int lengtha = a.size();  //Stores the length of the passed number
+		int lengthb = b.size();
+		int index = 0; //Stores the index we will use as we traverse the two numbers
+		int borrow = 0;  //Stores the borrow from the previous number
+		int number = 0;  //Stores the number inserted into the new array
+		ArrayList<Integer> temp = new ArrayList<> (); // Create a local array to hold the number 
+		ArrayList<Integer> temp2 = new ArrayList<>();
+		
+		while ( ( index < lengtha) || ( index < lengthb))
+		{
+			
+			if ((lengtha == 1)&& (lengthb == 1))
+			{
+				number = a.get(0) - b.get(0);
+				temp.add(number);
+			}
+			{
+				
+			}
+			if ( index < lengthb)
+			{
+				number = a.get(index) - b.get(index);
+				temp.add(number);
+			}
+			else
+			{
+				number = a.get(index);
+				temp.add(number);
+			}
+			index++;
+		}
+		
+		//Normalize the Array
+		number = 0;
+		
+		index = 0;
+		boolean flag = false;  //Holds the carry flag
+		while ( index < temp.size())
+		{
+			if ( temp.get(index) < 0)
+			{
+				number = temp.get(index)+ 10;
+				flag = true;
+			}
+			else
+			{
+				number = temp.get(index);
+				flag = false;
+				
+			}
+			if ((flag) && index < temp.size() - 1)
+			{
+				borrow = temp.get(index+1);
+				borrow--;
+				temp.set(index+1, borrow);
+				flag = false;
+			}
+			index++;
+			temp2.add(number);
+			number = 0;
+			
+			
+		}
+		
+		//System.out.println(temp.toString()); //Remove Used to add the numbers together by hand and verify input to the class
+		return temp2;
+		
+		
+	}
+	
+	public BigInt multiply( BigInt b)
+	{
+		boolean newSign = true; //Hold the sign of the product of the multiplication
+		newSign = this.resolveSignMultiplyDivide(this.isPositive, b.isPositive);
+		
+		ArrayList<Integer> product = new ArrayList<Integer>();
+		product = this.multiplyTwoArrays( this.theBigInt, b.theBigInt);
+		String test = "";
+		test = this.parseNumberToString(product);
+		BigInt temp = new BigInt(test);
+		temp.setTheSign(newSign);
+		
+		
+		return temp;
+	}
+	
+	public BigInt multiply( int b)
+	{
+		String convertedIntToString;
+		boolean signFlag;
+		//convertedIntToString = this.convertIntToString(b);
+		ArrayList<Integer> number = new ArrayList<Integer>();
+		number = this.convertIntToArray(b);
+		ArrayList<Integer> product = new ArrayList<Integer>();
+		product = this.multiplyTwoArrays(number, this.theBigInt);
+		convertedIntToString = this.parseNumberToString(product);
+		if ( b >= 0)
+		{
+			signFlag = true;
+		}
+		else
+		{
+			signFlag = false;
+		}
+		BigInt ProductOfTheMultiplication = new BigInt(convertedIntToString);
+		ProductOfTheMultiplication.setTheSign(signFlag);
+		
+		return ProductOfTheMultiplication;
+	}
+	
+	private String convertIntToString( int b)
+	{
+		String ConvertedString = "";
+		int workingTemp = 0;
+		char letterToAdd = ' ';
+		int number = 0;
+		workingTemp = b;
+		if ( workingTemp == 0)
+		{
+			ConvertedString = "0";
+			return ConvertedString;
+		}
+		while ( workingTemp > 0)
+		{
+			number = workingTemp % 10;
+			workingTemp = workingTemp / 10;
+			letterToAdd = (char)(number + '0');
+			ConvertedString += letterToAdd;
+		}
+		return ConvertedString;
+	}
+	
+	public ArrayList<Integer> convertIntToArray ( int b)
+	{
+		ArrayList<Integer> parsedArray = new ArrayList<Integer>();  //Holds the number b broken into 
+		//Components ie. b = 56789 would be 5,6,7,8,9
+		if ( b < 0)
+		{
+			b = b * -1;  // we need the absolute value of the number
+		}
+		
+		if ( b == 0)
+		{
+			parsedArray.add(b);
+			return parsedArray;
+		}
+		int working = b;
+		int number = 0;
+		//int remainder = 0;
+		while ( working > 0)
+		{
+			number = working % 10;
+			parsedArray.                                                                                                                                                                                                                                                                                add(number);
+			working = working / 10;
+			
+		}
+		
+		return parsedArray;
+	}
+	
+	private ArrayList<Integer> shiftAndAdd( ArrayList<Integer> a1, ArrayList<Integer> a2)
+	{
+		int lengthPassed = 0;  //Stores the length of the passed number
+		int index = 0; //Stores the index we will use as we traverse the two numbers
+		int carry = 0;  //Stores the carry over form the addition
+		int number = 0;  //Stores the number inserted into the new array
+		ArrayList<Integer> temp = new ArrayList<> (); // Create a local array to hold the number 
+		
+		lengthPassed = a2.size();
+		while ( ( index < lengthPassed) || ( index < a1.size()))
+		{
+			number = carry; // add any carryover from the previous addition
+			if (index < lengthPassed)
+			{  // Check to see if the index ref is a valid location in the array, else skip the array
+				number = number + a2.get(index);  //Add the element at the nth location of the first array
+			}
+			if ( index < a1.size())
+			{  // Check to see if the index ref is a valid location in the array, else skip the array
+				number = number + a1.get(index);  //Add the element in the nth location
+				
+			}
+			carry = number / 10; //Handle the cases where the addition is larger than 10 ie. 9+9 = 18 
+			//This will be a 1;
+			number = number % 10; // The remainder will be the number we insert into the array.
+			temp.add(number);
+			index++;
+			//System.out.println("Number = " + number + " Carry = " + carry); //Testing the input
+			number = 0;
+			
+		}
+		if ( carry > 0)
+		{
+			temp.add(carry);
+		}
+		//System.out.println(temp.toString()); //Remove Used to add the numbers together by hand and verify input to the class
+		return temp;
+		//return a2;
+	}
+	
+	private ArrayList<Integer> multiplyTwoArrays( ArrayList<Integer> a1, ArrayList<Integer> a2)
+	{
+		BigInt test = new BigInt();
+		ArrayList<Integer> temp = new ArrayList<Integer>();
+		ArrayList<Integer> product = new ArrayList<Integer>();
+		product.add(0);
+		for( int outerIndex = 0; outerIndex < a1.size(); outerIndex++)
+		{
+			int number = a1.get(outerIndex); // it the number in the index position
+			temp = this.multiplyIntArray(number, a2, outerIndex);  
+			//Multiply the number by the whole other array
+			product = this.shiftAndAdd(temp, product);
+		}
+		return product;
+	}
+	
+	private ArrayList<Integer> multiplyIntArray(  int number, ArrayList<Integer> a, int index2)
+	{
+		int product = 0;
+		int carry = 0;
+		ArrayList<Integer> productArray = new ArrayList<Integer>();
+		for ( int count = 0; count < index2; count++)
+		{
+			productArray.add(0);
+		}
+		for ( int index = 0; index < a.size(); index++)
+		{
+			product = ( a.get(index) * number ) % 10 + carry;
+			carry = ( a.get(index) * number) / 10;
+			productArray.add(product);
+			product = 0;
+		}
+		if ( carry != 0)
+		{
+			productArray.add(carry);
+		}
+		return productArray;
+	}
+	
+	private boolean resolveSignMultiplyDivide( boolean b1, boolean b2)
+	{
+		boolean newSign = false;
+		if ( b1 == b2)
+		{
+			newSign = true;  //If both numbers have the same sign the result will be positive
+		}
+		else
+		{
+			newSign = false;  //If the numbers are of different signs then the result will be negative
+		}
+		return newSign;
+	}
+	
+	private ArrayList removeLeadingZeros( ArrayList<Integer> a)
+	{
+		//ArrayList<Integer> working = new ArrayList<Integer>();
+		int index = a.size()- 1;
+		boolean firstSigFigFound = false;
+		//String number = "";
+		while ( index >= 0)
+		{
+			if ( (!firstSigFigFound) && ( a.get(index) == 0))
+			{
+				a.remove(index);
+			}
+			else
+			{
+				firstSigFigFound = true;
+			}
+			index--;
+		}
+		
+		return a;
+	}
+	
+	public BigInt divideBy( BigInt b)
+	{
+		BigInt quotient = new BigInt();
+		Boolean numeratorSign = this.getIsPositive();
+		Boolean denominatorSign = b.getIsPositive();
+		//ArrayList<Integer> quotientNumber = new ArrayList<Integer>();
+		//ArrayList<Integer> denominator = new ArrayList<Integer>();
+		
+		if ( !this.greaterThan(b))
+		{
+			quotient.setTheBigInt("0");
+			//This handles the case where the divisor is larger than the numerator
+		}
+		else
+		{
+			
+			quotient = this.divideTwoNumbers( this.theBigInt, b.theBigInt);
+			quotient.setTheSign(this.resolveSignMultiplyDivide(numeratorSign, denominatorSign));
+			
+		}
+		return quotient;
+	}
+	
+	
+	private BigInt divideTwoNumbers( ArrayList<Integer> a1, ArrayList<Integer> a2)
+	{
+		ArrayList<Integer> remainder = new ArrayList<Integer>();
+		ArrayList<Integer> numerator = new ArrayList<Integer>();
+		ArrayList<Integer> denominator = new ArrayList<Integer>();
+		ArrayList<Integer> quotient = new ArrayList<Integer>();
+		
+		int denominatorAdd = 0;
+		boolean flagCarry = false;
+		for ( int index2 = a2.size(); index2 > 0; index2--)
+		{
+			denominatorAdd = a2.get(index2 -1);
+			denominator.add(denominatorAdd);
+		}
+		int denominatorLength = a2.size();
+		int count = 0;
+		boolean firstSigFigFound = false;
+		boolean equalTo = false;
+		int numeratorAdd = 0;
+		Stack<Integer> numberBuild = new Stack<Integer>();
+		int index =a1.size();
+		index--;
+		int carry = 0;
+		while ( index >= 0 )
+		{
+			count = count + carry;
+			if ( (numerator.size() < a2.size()) || !this.greaterThan(numerator, denominator))
+			{
+				//System.out.println(" Index: " + index);
+				numeratorAdd = a1.get(index);
+				numerator.add(numeratorAdd);
+				//System.out.print(numeratorAdd);
+				//numberBuild.push(count);
+				
+				//quotient.add(0);
+			}
+			if ( firstSigFigFound)
+			{
+				quotient.add(0, 0);
+			}
+			if ( this.greaterThan(numerator, denominator))
+			{
+				//System.out.println("Made it to the subtraction section");
+				//if (numerator.equals(denominator))
+				//{
+				//	quotient.add(1);
+				//	remainder.clear();
+				//	firstSigFigFound = true;
+				//}
+				while ( this.greaterThan(numerator, denominator))
+				{
+					
+					count++;
+					firstSigFigFound = true;
+					remainder = this.subtractTwoNumbers(numerator, denominator);
+					remainder = this.removeLeadingZeros(remainder);
+					numerator.clear();
+					for ( int index4 = 0; index4 < remainder.size(); index4++)
+					{
+						int temp = 0;
+						temp = remainder.get(index4);
+						numerator.add(temp);
+					}		
+					if ( count > 9)
+					{
+						//quotient.add();
+						//count = count % 10;
+						flagCarry = true;
+					}
+					
+					
+					
+				}
+				//count = count * 10;
+				//System.out.println(count);
+				if ( flagCarry)
+				{
+					carry = count /10;
+				}
+				count = count % 10;
+				quotient.add(count);
+				flagCarry = false;
+				count = 0;
+			}
+			
+			
+			index--;
+			//quotient.add(count);
+			//count = 0;
+		}
+		
+		//System.out.println(quotient);
+		ArrayList<Integer> returnArray = new ArrayList<Integer>();
+		for ( int i = quotient.size() - 1; i >= 0; i--)
+		{
+			returnArray.add(quotient.get(i));
+		}
+		//quotient.add(count);
+		quotient = this.removeLeadingZeros(returnArray);
+		//System.out.println("Made it to the end");
+		String number2 = this.parseNumberToString(quotient);
+		BigInt theQuotient = new BigInt(number2);
+		return theQuotient;
+	}
+	
+	
+	
+	public boolean greaterThan( ArrayList<Integer> a, ArrayList<Integer> b) // a > b
+	{
+		boolean isGreater = true;
+		//boolean returnDone = false;
+		
+		if (a.size() < b.size())
+		{
+			isGreater = false; //The second number is a larger number by looking at the length
+			return isGreater;
+		}
+		if ( a.size() > b.size())
+		{
+			isGreater = true;
+			return isGreater;
+		}
+		if ( b.size() == a.size())
+		{
+			//We can not determine by looking at the lengths which is larger now we have to look in more detail
+			int index = a.size();
+			index--;
+			while ( index >= 0)
+			{
+				//System.out.println("False" + index + " " + this.theBigInt.get(index) + " " + b.theBigInt.get(index));
+				if ( a.get(index) < b.get(index))
+				{
+					isGreater = false; //here is a point where the second number is greater than the first
+					//index = -1; //We know the answer no use in looking further
+					//System.out.println("False" + index + " " + this.theBigInt.get(index) + " " + b.theBigInt.get(index));
+					return isGreater;
+				}
+				if ( a.get(index) > b.get(index))
+				{
+					isGreater = true; //here is a point where the second number is greater than the first
+					//index = -1; //We know the answer no use in looking further
+					//System.out.println("False" + index + " " + this.theBigInt.get(index) + " " + b.theBigInt.get(index));
+					return isGreater;
+				}
+				index--;
+			}
+		}
+		
+		return isGreater;
+	}
+	
+	public boolean greaterThan( ArrayList<Integer> a) // a > b
+	{
+		boolean isGreater = true;
+		
+		if ( this.length < a.size())
+		{
+			isGreater = false; //The second number is a larger number by looking at the length
+		}
+		if ( this.length == a.size())
+		{
+			//We can not determine by looking at the lengths which is larger now we have to look in more detail
+			int index = a.size();
+			index--;
+			while ( index >= 0)
+			{
+				//System.out.println("False" + index + " " + this.theBigInt.get(index) + " " + b.theBigInt.get(index));
+				if ( this.theBigInt.get(index) < a.get(index))
+				{
+					isGreater = false; //here is a point where the second number is greater than the first
+					//index = -1; //We know the answer no use in looking further
+					//System.out.println("False" + index + " " + this.theBigInt.get(index) + " " + b.theBigInt.get(index));
+					return isGreater;
+				}
+				if ( this.theBigInt.get(index) > a.get(index))
+				{
+					isGreater = true; //here is a point where the second number is greater than the first
+					//index = -1; //We know the answer no use in looking further
+					//System.out.println("False" + index + " " + this.theBigInt.get(index) + " " + b.theBigInt.get(index));
+					return isGreater;
+				}
+				index--;
+			}
+		}
+		
+		return isGreater;
+	}
+	
+	public BigInt modulus( BigInt b)
+	{
+		if ( !this.greaterThan(b))
+		{
+			return this;
+		}
+		else
+		{
+			ArrayList<Integer> mod = new ArrayList<Integer>();
+			mod = modulusOfTwoArrays( this.theBigInt, b.theBigInt);
+			String number = this.parseNumberToString(mod);
+			BigInt theMod = new BigInt(number);
+			return theMod;
+		}
+	}
+	
+	private ArrayList<Integer> modulusOfTwoArrays( ArrayList<Integer> a1, ArrayList<Integer> a2)
+	{
+		ArrayList<Integer> remainder = new ArrayList<Integer>();
+		ArrayList<Integer> numerator = new ArrayList<Integer>();
+		ArrayList<Integer> denominator = new ArrayList<Integer>();
+		ArrayList<Integer> quotient = new ArrayList<Integer>();
+		ArrayList<Integer> returnArray = new ArrayList<Integer>();
+		int denominatorAdd = 0;
+		boolean flagCarry = false;
+		for ( int index2 = a2.size(); index2 > 0; index2--)
+		{
+			denominatorAdd = a2.get(index2 -1);
+			denominator.add(denominatorAdd);
+		}
+		int denominatorLength = a2.size();
+		
+		
+		boolean equalTo = false;
+		int numeratorAdd = 0;
+		
+		int index =a1.size();
+		index--;
+		
+		while ( index >= 0 )
+		{
+			
+			if ( (numerator.size() < a2.size()) || !this.greaterThan(numerator, denominator))
+			{
+				//System.out.println(" Index: " + index);
+				numeratorAdd = a1.get(index);
+				numerator.add(numeratorAdd);
+				
+			}
+			
+			if ( this.greaterThan(numerator, denominator))
+			{
+				//System.out.println("Made it to the subtraction section");
+				//if (numerator.equals(denominator))
+				//{
+				//	quotient.add(1);
+				//	remainder.clear();
+				//	firstSigFigFound = true;
+				//}
+				while ( this.greaterThan(numerator, denominator))
+				{
+					
+					numerator = this.subtractTwoNumbers(numerator, denominator);
+					numerator = this.removeLeadingZeros(numerator);
+					if ( (numerator.size() < 1) && ( index == a1.size() - 1))
+					{
+						numerator.add(0);
+						return numerator;
+					}
+					
+					
+					
+					
+					
+					
+				}
+				
+				
+				
+			}
+			
+			
+			index--;
+			
+		}
+		
+		
+		
+		for ( int i = numerator.size() - 1; i >= 0; i--)
+		{
+			returnArray.add(numerator.get(i));
+		}
+		//quotient.add(count);
+		quotient = this.removeLeadingZeros(returnArray);
+		//System.out.println("Made it to the end");
+		
+		return quotient;
+	}
+	
+	private void setTheBigInt(String s)
+	{
+		this.parseUserString(s);
+		int tempLength = theBigInt.size();
+		this.setLength(tempLength);
+	}
+	
+	private void parseUserString(String s)
+	{
+		//Reading the string from front to back to make sure the syntax is correct
+		//Also reading form the front to the back allows for better exception handling
+		int index = 0;
+		int number = 0;
+		
+		try 
+		{
+			while ( ( s.charAt(index) == ' ') && (index < s.length()))
+			{
+				index++; //Eliminate the leading blank spaces
+			}
+			if ( (s.charAt(index) == '-') && ( index < s.length()))
+			{
+				this.isPositive = false;  //Process the negative sign
+				index++; // Move to the next element
+			}
+			if ( (s.charAt(index) == '+') && (index < s.length()))
+			{
+				index++; //Move to the next character in the string
+			}
+			while ( index < s.length())
+			{
+				if (Character.isDigit(s.charAt(index)))
+				{
+					//Reuse of Code from CSC 200
+					number *= 10;
+					number += s.charAt(index) - '0';
+					index++;
+					tempInt.add(number);
+					number = 0;
+					
+				}
+				else
+				{
+					throw new Exception("Invalid string data");
+				}
+			}
+			
+		}
+		catch ( Exception e)
+		{
+			System.out.println(e);
+		}
+		this.createTheBigInt();
+		
+	}
+	
+	private String parseNumberToString(ArrayList<Integer> a)
+	{
+		int index = 0;
+		char letter;
+		String temp ="";
+		int number = 0;
+		while ( index < a.size())
+		{
+			number = a.get(index);
+			letter = (char)(number + '0');
+			temp += letter;
+			index++;
+			
+		}
+		//System.out.println(temp);
+		//Now we need to flip the array to the correct order so we are leading with the LSD
+		String returnString = "";
+		index = temp.length();
+		index--;
+		while (index >=0)
+		{
+			returnString += temp.charAt(index);
+			index--;
+		}
+		return returnString;
+	}
+	
+	private void createTheBigInt()
+	{
+		int index = this.tempInt.size();
+		index--;
+		while (index >=0)
+		{
+			theBigInt.add(tempInt.get(index));
+			index--;
+		}
+	}
+	
+	private void setTheSign( boolean b)
+	{
+		this.isPositive = b;
+	}
+
+	//Math Functions
+	
+	public BigInt add( BigInt b)
+	{
+		boolean otherBigIntSign = true;  //Used in the comparison of the two numbers
+		boolean finalIsPositive = true; //Hold the sign of the final number;
+		
+		ArrayList<Integer> tempNumber = new ArrayList<Integer>();
+		String test = "";
+		/**
+		 * The easiest way to view the math is if the signs are the same we are adding the numbers
+		 * If the numbers are different we are subtracting the smaller number from the larger and keeping the 
+		 * sign of the larger number.
+		 */
+		otherBigIntSign = b.getIsPositive();
+		if (otherBigIntSign == this.isPositive)
+		{
+			tempNumber = this.addTwoDigits( b.theBigInt );
+			test = this.parseNumberToString(tempNumber);
+			if ( !this.isPositive)
+			{
+				finalIsPositive = false; // Both numbers were negative.
+			}
+		}
+		else
+		{
+			if ( this.greaterThan(b))
+			{
+				
+				tempNumber = this.subtractTwoNumbers(this.theBigInt, b.theBigInt);
+				//System.out.println(tempNumber.toString());
+				test = this.parseNumberToString(tempNumber);
+				finalIsPositive = this.getIsPositive();
+				
+				//test = "987654321";
+			}
+			else
+			{
+				//System.out.println("Subtraction Time A");
+				tempNumber = this.subtractTwoNumbers(b.theBigInt, this.theBigInt);
+				//System.out.println(tempNumber.toString());
+				test = this.parseNumberToString(tempNumber);
+				finalIsPositive = b.getIsPositive();
+				//System.out.println("Subtraction Time B");
+				//test = "987654321";
+			}
+		}
+		BigInt temp = new BigInt(test);
+		temp.setTheSign(finalIsPositive);
+		return temp;
+	}
+	
+	public BigInt add(int n)
+	{
+		ArrayList<Integer> number = new ArrayList<Integer>();
+		String parsedNumber = "";
+		number = this.convertIntToArray(n);
+		//parsedNumber = this.convertIntToString(n);
+		parsedNumber = this.parseNumberToString(number);
+		Boolean b = true;
+					
+		if ( n < 0)
+		{
+			b = false;
+			
+		}
+		BigInt Sum = new BigInt(parsedNumber);
+		Sum.setTheSign(b);
+		return this.add(Sum);
+		
+	}
+	
+	private ArrayList<Integer> addTwoDigits( ArrayList<Integer> b)
+	{
+		int lengthPassed = 0;  //Stores the length of the passed number
+		int index = 0; //Stores the index we will use as we traverse the two numbers
+		int carry = 0;  //Stores the carry over form the addition
+		int number = 0;  //Stores the number inserted into the new array
+		ArrayList<Integer> temp = new ArrayList<> (); // Create a local array to hold the number 
+		
+		lengthPassed = b.size();
+		while ( ( index < lengthPassed) || ( index < this.length))
+		{
+			number = carry; // add any carryover from the previous addition
+			if (index < lengthPassed)
+			{  // Check to see if the index ref is a valid location in the array, else skip the array
+				number = number + b.get(index);  //Add the element at the nth location of the first array
+			}
+			if ( index < this.length)
+			{  // Check to see if the index ref is a valid location in the array, else skip the array
+				number = number + theBigInt.get(index);  //Add the element in the nth location
+				
+			}
+			carry = number / 10; //Handle the cases where the addition is larger than 10 ie. 9+9 = 18 
+			//This will be a 1;
+			number = number % 10; // The remainder will be the number we insert into the array.
+			temp.add(number);
+			index++;
+			//System.out.println("Number = " + number + " Carry = " + carry); //Testing the input
+			number = 0;
+			
+		}
+		if ( carry > 0)
+		{
+			temp.add(carry);
+		}
+		//System.out.println(temp.toString()); //Remove Used to add the numbers together by hand and verify input to the class
+		return temp;
+	}
+	//Output
+	
+	@Override
+	public String toString()
+	{
+		String stringOutput = "";
+		
+		int index = 0;
+		while ( index < this.length)
+		{
+			stringOutput += theBigInt.get(index);
+			index++;
+		}
+		if (!isPositive)
+		{
+			stringOutput += '-';
+			
+		}
+		return stringOutput;
+	}
+	
+	
+
+}

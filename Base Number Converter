@@ -1,0 +1,208 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class BaseConversion {
+
+	//Data
+	String originalNumberRead;  		//Stores the number the user enters as a string
+	String originalBaseRead;  			//Stores the base of the original number
+	String newBaseRead; 				//Stores the base the original number needs to be converted to
+	String BaseRef = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	String output = "";
+	ArrayList<Integer> temp1 = new ArrayList<>();
+			
+	
+	long originalNumber = 0;			//Stores the converted user number
+	int originalBase = 0;				//Stores the base of the original number
+	int newBase = 2;					//Stores the base of the new number
+	long newNumber = 0;					//Stores the number in the new base
+	long temp = 0;
+	
+	char quit = 'n';
+	
+	
+	//Constructors
+	BaseConversion()
+	{
+		this.setNewNumber(0);
+		this.setOriginalBase(0);
+		this.setOriginalNumber(0);
+	}
+	
+	BaseConversion( long originalN, int originalB)
+	{
+		//this.setNewNumber(0);
+		this.setOriginalBase(0);
+		this.setOriginalNumber(0);
+	}
+	
+	//Accessors
+	
+	public String getOriginalNumberRead()
+	{
+		return originalNumberRead;
+	}
+	
+	public String getOriginalBaseRead()
+	{
+		return originalBaseRead;
+	}
+	
+	public String getNewBaseRead()
+	{
+		return newBaseRead;
+	}
+	
+	public Long getOriginalNumber()
+	{
+		return originalNumber;
+	}
+	
+	public int getOriginalBase()
+	{
+		return originalBase;
+	}
+	
+	public int getNewBase ()
+	{
+		return newBase;
+	}
+	
+	public long getNewNumber()
+	{
+		return newNumber;
+	}
+	
+	public long getTemp()
+	{
+		return temp;
+	}
+	
+	
+	//Modifiers
+	
+	public void convertNumbers()
+	{
+		while ( newBase > 0)
+		{
+			this.promptForInput();
+			if ( (newBase > 1) && ( originalBase > 1))
+			{
+				this.Convert();
+				
+			}
+			this.printResult();
+			this.clearValues();
+		}
+		
+			
+		
+	}
+	
+	private void clearValues()
+	{
+		//Clears all the values to prevent unintended results form previous runs
+		originalNumberRead = "";
+		originalBaseRead = "";
+		newBaseRead = "";
+		this.setNewNumber(0);
+		this.setOriginalBase(0);
+		this.setOriginalNumber(0);
+		newBase = 2;					
+		output = "";
+		temp1.clear();
+		
+	}
+	
+	private void Convert()
+	{
+		//Converts the number using the division method
+		int index = 1;
+		//int[] workingNumber = new int[20];
+		long remainder = 0;
+		long working = 0;
+		
+		working = originalNumber;
+		while ( working > 0)
+		{
+			remainder = working % newBase;
+			working = working / newBase;
+			temp1.add((int)remainder);
+			
+			index = index * 10;
+		}
+		if ( remainder > 0)
+		{
+			//newNumber = newNumber + ( remainder * index);
+		}
+		
+		int length = temp1.size();
+		int addressOfNumber =0;
+		for ( int index1 = length - 1; index1 >= 0; index1--)
+		{
+			addressOfNumber = temp1.get(index1);
+			//System.out.print(addressOfNumber);
+			output+= BaseRef.charAt(addressOfNumber);
+		}
+		
+		
+		
+	}
+	
+	private void printResult()
+	{
+		System.out.println("The number in base " + newBase + " is " + output);
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+	}
+	
+	private void setOriginalNumber( long originalN)
+	{
+		//Method sets the value of the Original number to being the value stored in originalN
+		originalNumber = originalN;
+	}
+	
+	private void setOriginalBase( int originalB)
+	{
+		//Method sets the value of the original base to being the value stored in originalB
+		originalBase = originalB;
+	}
+	
+	private void setNewNumber( long newN)
+	{
+		//Method sets the value of the new number to being the value stored in newN
+		newNumber = newN;
+	}
+	
+	public void promptForInput()
+	{
+		//Method asks for the user for input
+		Scanner keyboard = new Scanner(System.in);
+		System.out.println("Base Conversion Program to exit the program enter a radix equal to 0:");
+		System.out.println();
+		System.out.print( "Enter a number: ");
+		originalNumberRead = keyboard.nextLine();
+		System.out.println();
+		System.out.print("Enter the number's base: ");
+		originalBaseRead = keyboard.nextLine();
+		System.out.println();
+		System.out.print("Enter the radix to be converted to: ");
+		newBaseRead = keyboard.nextLine();
+		System.out.println();
+		
+		
+		//Comment out the following code Added to facilitate testing
+		//System.out.println(originalNumberRead + " " + originalBaseRead);
+		System.out.println();
+		originalBase = Integer.parseInt(originalBaseRead);
+		originalNumber = Long.parseLong(originalNumberRead, originalBase);
+		originalBase = Integer.parseInt(originalBaseRead);
+		newBase = Integer.parseInt(newBaseRead);
+		//System.out.println(originalNumber + " " + originalBase);
+		
+		//temp = Long.parseLong(originalNumberRead, newBase);
+		//System.out.println(temp);
+	}
+}

@@ -1,0 +1,30 @@
+//import LinkedListPolynomial.LLNode;
+
+/*
+ * Interface for the Polynomial Project.  
+ */
+
+
+public interface PolynomialInterface
+{
+	
+
+	PolynomialInterface add( PolynomialInterface other);
+	//Effect: Adds value to owner of addPolynomial method
+	//Post-Condition:  Return value = this + value
+	
+	PolynomialInterface subtract( PolynomialInterface other);
+	//Effect:  Subtracts value from owner of addPolynomial method
+	//Post-Condition:  Return value = this - value
+	
+	void readPolynomial();
+	//Post-Condition:  polynomial read
+	
+	String toString();
+	//Post-Condition polynomial converted to string
+
+	
+	
+	
+
+}

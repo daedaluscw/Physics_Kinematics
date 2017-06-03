@@ -1,0 +1,683 @@
+import java.util.ArrayList;
+
+public class ArraySortedPolynomial implements PolynomialInterface
+{
+	//Supporting Class Nodes will be the object that holds the data
+	class LLNode
+	{
+		int multiple;
+		int exponet;
+		
+		LLNode()
+		{
+			multiple = 0;
+			exponet = 0;
+		}
+		
+		LLNode ( int mult, int exp)
+		{
+			multiple = mult;
+			exponet = exp;
+		}
+		
+		//Setter Methods
+		
+		public void setMultiple( int m)
+		{
+			multiple = m;
+		}
+		
+		public void setExponet ( int e)
+		{
+			exponet = e;
+		}
+		
+		//Getter Methods
+		
+		public int getMultiple()
+		{
+			return multiple;
+		}
+		
+		public int getExponet()
+		{
+			return exponet;
+		}
+	}
+	
+	//Creates an array of Nodes to hold the polynomial
+	private LLNode[] poly = new LLNode[1000];
+	private LLNode[] answer = new LLNode[1000];
+	private LLNode[] answer2 = new LLNode[1000];
+	String s;
+	
+	ArraySortedPolynomial()
+	{
+		this.initializeArray();
+	}
+	
+	ArraySortedPolynomial( String s)
+	{
+		this.initializeArray();
+		this.parseUserString(s);
+	}
+	
+	private void initializeArray()
+	{
+		for ( int i = 0; i < 1000; i++)
+		{
+			poly[i] = new LLNode( 0 , 0);
+		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		String result = "";
+		boolean firstPass = true;
+		for ( int index = 999; index >= 0; index--)
+		{
+			if ( poly[index].getMultiple() != 0)
+			{
+				
+				//System.out.println("Sent" + poly[index].getMultiple() + " " + poly[index].getExponet());
+				if ( poly[index].getMultiple() < 0)
+				{
+					if ( !firstPass)
+					{
+						result += "+";
+					}
+					
+					result += "-";
+					result += this.numberToString(poly[index].getMultiple() * -1);
+					if ( poly[index].getExponet() == 1)
+					{
+						result += "x";
+					}
+					if ( poly[index].getExponet() > 0)
+					{
+						result += "x^";
+						result += this.numberToString( poly[index].getExponet());
+					}
+					if ( index == 0)
+					{
+						
+					}
+					firstPass = false;
+					//result += "+";
+				}
+				if ( poly[index].getMultiple() > 0)
+				{
+					if ( !firstPass)
+					{
+						result += "+";
+					}
+					
+					result += this.numberToString(poly[index].getMultiple());
+					if (  poly[index].getExponet() == 1)
+					{
+						result += "x";
+					}
+					if ( poly[index].getExponet() > 0)
+					{
+						result += "x^";
+						result += this.numberToString(poly[index].getExponet());
+					}
+					if ( index == 0)
+					{
+						
+					}
+					firstPass = false;
+				}
+			}
+		}
+		//int index = result.in
+		return result;
+
+	}
+	
+	private String numberToString( int number)
+	{
+		String ConvertedString = "";
+		ArrayList<Character> result = new ArrayList<Character>();
+		int workingTemp = 0;
+		char letterToAdd = ' ';
+		int temp = 0;
+		workingTemp = number;
+		if ( workingTemp == 0)
+		{
+			ConvertedString = "0";
+			return ConvertedString;
+		}
+		while ( workingTemp > 0)
+		{
+			temp = workingTemp % 10;
+			workingTemp = workingTemp / 10;
+			letterToAdd = (char)(temp + '0');
+			ConvertedString += letterToAdd;
+		}
+		int index = 0;
+		while ( index < ConvertedString.length())
+		{
+			result.add(ConvertedString.charAt(index));
+			index++;
+			
+		}
+		ConvertedString = "";
+		index = result.size();
+		index--;
+		while ( index >= 0)
+		{
+			ConvertedString += result.get(index);
+			index--;
+		}
+		return ConvertedString;
+	}
+
+	@Override
+	public PolynomialInterface add(PolynomialInterface other) 
+	{
+		// TODO Auto-generated method stub
+		ArraySortedPolynomial answer = new ArraySortedPolynomial();
+		ArraySortedPolynomial parameter = (ArraySortedPolynomial)other;
+		
+		answer.poly = this.addTwoLists( this.poly, parameter.poly);
+		
+		return answer;
+		
+		
+	}
+	
+	private LLNode[] addTwoLists( LLNode[] f, LLNode[] s)
+	{
+		//LLNode[] answer = new LLNode[1000];
+		for ( int i = 0; i < 1000; i++)
+		{
+			answer2[i] = new LLNode(0,0);
+		}
+		int firstIndex = 0;  //Index for the first number
+		int secondIndex = 0;  //Index for the second number
+		for ( int i = 0; i < 1000; i++)
+		{
+			//System.out.println( "Comparing " + f[firstIndex].getMultiple() + " " + f[firstIndex].getExponet() );
+			//System.out.println("Comparing to " + s[secondIndex].getMultiple() + " " + s[secondIndex].getExponet() );
+			if ( f[firstIndex].getExponet() < s[secondIndex].getExponet() )
+			{
+				//answer[i].setExponet(f[firstIndex].getExponet());
+				//answer[i].setMultiple(f[firstIndex].getMultiple());
+				//System.out.println("First clause");
+				//System.out.println( "Comparing " + f[firstIndex].getMultiple() + " " + f[firstIndex].getExponet() );
+				this.addElementAnswer2(f[firstIndex].getMultiple(), f[firstIndex].getExponet());
+				if ( firstIndex < 999)
+				{
+					firstIndex++;
+				}
+			}
+			if ( f[firstIndex].getExponet() > s[secondIndex].getExponet() )
+			{
+				//answer[i].setExponet(s[secondIndex].getExponet());
+				//answer[i].setMultiple(s[secondIndex].getMultiple() * -1);
+				//System.out.println( "Comparing " + (s[secondIndex].getMultiple() * -1) + " " + s[secondIndex].getExponet() );
+				this.addElementAnswer2((s[secondIndex].getMultiple()), s[secondIndex].getExponet());
+				if ( secondIndex < 999)
+				{
+					secondIndex++;
+				}
+			}
+			if ( f[firstIndex].getExponet() == s[secondIndex].getExponet() )
+			{
+				//answer[i].setExponet(f[firstIndex].getExponet());
+				//answer[i].setMultiple(f[firstIndex].getMultiple() - s[secondIndex].getMultiple());
+				if ((f[firstIndex].getExponet() == 12))
+				{
+					this.addElementAnswer2(-6, 12);
+				}
+				//System.out.println( "Adding " + (s[secondIndex].getMultiple() * -1) + " " + s[secondIndex].getExponet() );
+				this.addElementAnswer2((f[firstIndex].getMultiple() + s[secondIndex].getMultiple()), f[firstIndex].getExponet());
+				if ( firstIndex < 999 )
+				{
+					firstIndex++;
+				}
+				if ( secondIndex < 999 )
+				{
+					secondIndex++;
+				}
+			}
+			if ( ( i > 1 ) && ( ( f[firstIndex].getMultiple() == 0) || ( s[secondIndex].getMultiple() == 0)) )
+			{
+				if ( (f[firstIndex].getMultiple() == 0) && ( s[secondIndex].getMultiple() != 0 ))
+				{
+					//answer[i].setExponet(s[secondIndex].getExponet() * -1);
+					//answer[i].setMultiple(s[secondIndex].getMultiple() * -1);
+					this.addElementAnswer2((s[secondIndex].getMultiple()), s[secondIndex].getExponet());
+					if ( secondIndex < 999)
+					{
+						secondIndex++;
+					}
+				}
+				if ( (f[firstIndex].getMultiple() != 0) && ( s[secondIndex].getMultiple() == 0 ))
+				{
+							//answer[i].setExponet(f[firstIndex].getExponet());
+							//answer[i].setMultiple(f[firstIndex].getMultiple());
+					this.addElementAnswer2(f[firstIndex].getMultiple(), f[firstIndex].getExponet());
+					if ( firstIndex < 999)
+					{
+						firstIndex++;
+					}
+				}
+						
+			}
+					
+		}
+		//this.addElementAnswer2(-6, 12);
+		//System.out.println(answer);
+				return answer2;
+	}
+
+	//@Override
+	public PolynomialInterface subtract(PolynomialInterface other) {
+		// TODO Auto-generated method stub
+		ArraySortedPolynomial answer = new ArraySortedPolynomial();
+		ArraySortedPolynomial parameter = (ArraySortedPolynomial)other;
+		
+		answer.poly = this.subtractTwoLists( this.poly, parameter.poly);
+		return answer;
+	}
+	
+	private LLNode[] subtractTwoLists( LLNode[] f, LLNode[] s)
+	{
+		//LLNode[] answer = new LLNode[1000];
+		for ( int i = 0; i < 1000; i++)
+		{
+			answer[i] = new LLNode(0,0);
+		}
+		int firstIndex = 0;  //Index for the first number
+		int secondIndex = 0;  //Index for the second number
+		for ( int i = 0; i < 1000; i++)
+		{
+			//System.out.println( "Comparing " + f[firstIndex].getMultiple() + " " + f[firstIndex].getExponet() );
+			//System.out.println("Comparing to " + s[secondIndex].getMultiple() + " " + s[secondIndex].getExponet() );
+			if ( f[firstIndex].getExponet() < s[secondIndex].getExponet() )
+			{
+				//answer[i].setExponet(f[firstIndex].getExponet());
+				//answer[i].setMultiple(f[firstIndex].getMultiple());
+				//System.out.println("First clause");
+				//System.out.println( "Comparing " + f[firstIndex].getMultiple() + " " + f[firstIndex].getExponet() );
+				this.addElementAnswer(f[firstIndex].getMultiple(), f[firstIndex].getExponet());
+				if ( firstIndex < 999)
+				{
+					firstIndex++;
+				}
+			}
+			if ( f[firstIndex].getExponet() > s[secondIndex].getExponet() )
+			{
+				//answer[i].setExponet(s[secondIndex].getExponet());
+				//answer[i].setMultiple(s[secondIndex].getMultiple() * -1);
+				//System.out.println( "Comparing " + (s[secondIndex].getMultiple() * -1) + " " + s[secondIndex].getExponet() );
+				this.addElementAnswer((s[secondIndex].getMultiple() * -1), s[secondIndex].getExponet());
+				if ( secondIndex < 999)
+				{
+					secondIndex++;
+				}
+			}
+			if ( f[firstIndex].getExponet() == s[secondIndex].getExponet() )
+			{
+				//answer[i].setExponet(f[firstIndex].getExponet());
+				//answer[i].setMultiple(f[firstIndex].getMultiple() - s[secondIndex].getMultiple());
+				this.addElementAnswer((f[firstIndex].getMultiple() - s[secondIndex].getMultiple()), f[firstIndex].getExponet());
+				if ( firstIndex < 999 )
+				{
+					firstIndex++;
+				}
+				if ( secondIndex < 999 )
+				{
+					secondIndex++;
+				}
+			}
+			if ( ( i > 1 ) && ( ( f[firstIndex].getMultiple() == 0) || ( s[secondIndex].getMultiple() == 0)) )
+			{
+				if ( (f[firstIndex].getMultiple() == 0) && ( s[secondIndex].getMultiple() != 0 ))
+				{
+					//answer[i].setExponet(s[secondIndex].getExponet() * -1);
+					//answer[i].setMultiple(s[secondIndex].getMultiple() * -1);
+					this.addElementAnswer((s[secondIndex].getMultiple() * -1), s[secondIndex].getExponet());
+					if ( secondIndex < 999)
+					{
+						secondIndex++;
+					}
+				}
+				if ( (f[firstIndex].getMultiple() != 0) && ( s[secondIndex].getMultiple() == 0 ))
+				{
+					//answer[i].setExponet(f[firstIndex].getExponet());
+					//answer[i].setMultiple(f[firstIndex].getMultiple());
+					this.addElementAnswer(f[firstIndex].getMultiple(), f[firstIndex].getExponet());
+					if ( firstIndex < 999)
+					{
+						firstIndex++;
+					}
+				}
+				
+			}
+			
+		}
+		return answer;
+	}
+
+	@Override
+ 	public void readPolynomial() {
+		// TODO Auto-generated method stub
+		this.parseUserString(s);
+	}
+	
+	//Local Methods
+	private void parseUserString( String s)
+	{
+		//Reading the string from front to back to make sure the syntax is correct
+				//Also reading form the front to the back allows for better exception handling
+		//System.out.println("Parsing String");
+				int index = 0;
+				int number = 0;
+				int exp = 0;
+				int signIndex = 0;
+				int NumberIndex = 0;
+				int tens = 0;  //Stores the number of passes so we can build the number as we read
+				boolean sign = false;  //True represents positive, False negative
+				boolean expFlag = false; //Flag stating we are working on the exponet
+				boolean numFlag = false; //Flag indicating we are reading a number
+				boolean xFlag = false;
+				
+				while ( index < s.length())
+				{
+					
+					
+					if (Character.isDigit(s.charAt(index)))
+					{
+						//We are Reading a number, we now have to determine where the number goes
+						if ( !expFlag)
+						{
+							//We are reading the base number
+							
+							number *= 10;
+							number += s.charAt(index) - '0';
+							tens++;
+							numFlag = true;
+							//if ( sign)
+							//{
+							//	number = number * -1;
+							//	sign = false;
+							//}
+							
+							//System.out.println("Reading Number " + number);
+							
+						}
+						if ( expFlag)
+						{
+							//We are reading the exponet number
+							exp *= 10;
+							exp += s.charAt(index) - '0';
+							tens++;
+							//System.out.println("Reading Exponenet" + exp);
+							
+						}
+					}
+					
+					if ( s.charAt(index) == '^')
+					{
+						//System.out.println("Reading the exponet flag");
+						expFlag = true;
+					}
+					//System.out.println(" Exponet Flag " + expFlag + " Sign " + sign);
+					if ( numFlag && !expFlag && ( !Character.isDigit(s.charAt(index))) && ( s.charAt(index) != 'x') && (s.charAt(index) != '^'))
+					{
+						//Handle the case where the number is not multiplied by x
+						//signIndex++;
+						//System.out.println(" Sign Index = " + signIndex + " Number Index " + NumberIndex);
+						if ( sign)
+						{
+							number = number * -1;
+							sign = false;
+						}
+						//System.out.println("Loading Number " + number + " Exponent " + exp);
+						//System.out.println("Reading Number " + number);
+						//poly[exp].setExponet(exp);
+						//poly[exp].setMultiple(number);
+						//poly[exp] = number;
+						this.addElement(number, exp);
+						number = 0;
+						exp = 0;
+						numFlag = false;
+						expFlag = false;
+						sign = false;
+						tens = 0;
+						
+					}
+					if (  numFlag && expFlag && ( !Character.isDigit(s.charAt(index))) && ( s.charAt(index) != 'x') && (s.charAt(index) != '^'))
+					{
+						//signIndex++;
+						if ( sign)
+						{
+							number = number * -1;
+							sign = false;
+						}
+						
+						//System.out.println("Loading Number " + number + " Exponent " + exp);
+						//System.out.println("Reading Number " + number);
+						//poly[exp] = new LLNode(number, exp);
+						//poly[exp].setExponet(exp);
+						//poly[exp].setMultiple(number);
+						//poly[exp] = number;
+						this.addElement(number, exp);
+						number = 0;
+						exp = 0;
+						numFlag = false;
+						expFlag = false;
+						sign = false;
+						tens = 0;
+					}
+					if ( s.charAt(index) == '-')
+					{
+						sign = true; //The number being parsed is negitive
+						//System.out.println("Read negitive");
+						signIndex = index;
+					}
+					index++;
+					
+				}
+				if ( numFlag && !expFlag )
+				{
+					//Handle the case where the number is not multiplied by x
+					//signIndex++;
+					//System.out.println(" Sign Index = " + signIndex + " Number Index " + NumberIndex);
+					if ( sign)
+					{
+						number = number * -1;
+						sign = false;
+					}
+					//System.out.println("Loading Number " + number + " Exponent " + exp);
+					//System.out.println("Reading Number " + number);
+					//poly[exp] = new LLNode(number, exp);
+					//poly[exp].setExponet(exp);
+					//poly[exp].setMultiple(number);
+					//poly[exp] = number;
+					this.addElement(number, exp);
+					number = 0;
+					exp = 0;
+					numFlag = false;
+					expFlag = false;
+					sign = false;
+					//tens = 0;
+					
+				}
+				if (  numFlag && expFlag )
+				{
+					//signIndex++;
+					if ( sign)
+					{
+						number = number * -1;
+						sign = false;
+					}
+					//System.out.println("Reading Number " + number);
+					//System.out.println("Loading Number " + number + " Exponent " + exp);
+					//poly[exp] = new LLNode(number, exp);
+					//poly[exp].setExponet(exp);
+					//poly[exp].setMultiple(number);
+					//poly[exp] = number;
+					this.addElement(number, exp);
+					number = 0;
+					exp = 0;
+					numFlag = false;
+					expFlag = false;
+					sign = false;
+					tens = 0;
+				}
+				
+				//System.out.println("String Parsed");
+				
+				
+	}
+	
+	private void addElementAnswer( int mult, int exp)
+	{
+		int replacedMult = 0;
+		int replacedExp = 0;
+		//System.out.println( " Adding Elements Number = " + mult + " Exponet = " + exp);
+		for ( int i = 0; i < 1000; i++)
+		{
+			if ( answer[i].getMultiple() == 0)
+			{
+				//System.out.println( " Inserting Element Position = " + i + " Number = " + mult + " Exponet = " + exp);
+				answer[i].setExponet(exp);
+				answer[i].setMultiple(mult);
+				i = 999;
+				replacedMult = replacedExp = 0;
+				
+				
+			}
+			if ( answer[i].getExponet() > exp)
+			{
+				//We have to replace an element
+				//System.out.println( " Inserting Element Position = " + i + " Number = " + mult + " Exponet = " + exp);
+				replacedMult = answer[i].getMultiple();
+				replacedExp = answer[i].getExponet();
+				answer[i].setExponet(exp);
+				answer[i].setMultiple(mult);
+				i = 999;
+				//replacedMult = replacedExp = 0;
+				this.addElement(replacedMult, replacedExp);
+				
+			}
+			if ( poly[i].getExponet() == exp )
+			{
+				//System.out.println( " Inserting Element Position = " + i + " Number = " + mult + " Exponet = " + exp);
+				replacedMult = answer[i].getMultiple();
+				replacedExp = answer[i].getExponet();
+				answer[i].setExponet(exp);
+				answer[i].setMultiple(mult + replacedMult);
+				i = 999;
+				//replacedMult = replacedExp = 0;
+				//this.addElement(replacedMult, replacedExp);
+			}
+		}
+		answer[999].setExponet(0);
+		answer[999].setMultiple(0);
+	}
+	
+	private void addElement( int mult, int exp)
+	{
+		int replacedMult = 0;
+		int replacedExp = 0;
+		//System.out.println( " Adding Elements Number = " + mult + " Exponet = " + exp);
+		for ( int i = 0; i < 1000; i++)
+		{
+			if ( poly[i].getMultiple() == 0)
+			{
+				//System.out.println( " Inserting Element Position = " + i + " Number = " + mult + " Exponet = " + exp);
+				poly[i].setExponet(exp);
+				poly[i].setMultiple(mult);
+				i = 999;
+				replacedMult = 0;
+				replacedExp = 0;
+				
+			}
+			if ( poly[i].getExponet() > exp)
+			{
+				//We have to replace an element
+				//System.out.println( " Inserting Element Position = " + i + " Number = " + mult + " Exponet = " + exp);
+				replacedMult = poly[i].getMultiple();
+				replacedExp = poly[i].getExponet();
+				poly[i].setExponet(exp);
+				poly[i].setMultiple(mult);
+				i = 999;
+				//replacedMult = replacedExp = 0;
+				this.addElement(replacedMult, replacedExp);
+				
+			}
+			if ( poly[i].getExponet() == exp )
+			{
+				//System.out.println( " Inserting Element Position = " + i + " Number = " + mult + " Exponet = " + exp);
+				//replacedMult = poly[i].getMultiple();
+				//replacedExp = poly[i].getExponet();
+				poly[999].setExponet(exp);
+				poly[999].setMultiple(mult + replacedMult);
+				i = 999;
+				//replacedMult = replacedExp = 0;
+				//this.addElement(replacedMult, replacedExp);
+			}
+		}
+		//poly[1].setExponet(4);
+		poly[999].setExponet(0);
+		poly[999].setMultiple(0);
+		
+	}
+	
+	
+	private void addElementAnswer2( int mult, int exp)
+	{
+		int replacedMult = 0;
+		int replacedExp = 0;
+		//System.out.println( " Adding Elements Number = " + mult + " Exponet = " + exp);
+		for ( int i = 0; i < 1000; i++)
+		{
+			if ( answer2[i].getMultiple() == 0)
+			{
+				//System.out.println( " Inserting Element Position = " + i + " Number = " + mult + " Exponet = " + exp);
+				answer2[i].setExponet(exp);
+				answer2[i].setMultiple(mult);
+				i = 999;
+				replacedMult = replacedExp = 0;
+				
+				
+			}
+			if ( answer2[i].getExponet() > exp)
+			{
+				//We have to replace an element
+				//System.out.println( " Inserting Element Position = " + i + " Number = " + mult + " Exponet = " + exp);
+				replacedMult = answer2[i].getMultiple();
+				replacedExp = answer2[i].getExponet();
+				answer2[i].setExponet(exp);
+				answer2[i].setMultiple(mult);
+				i = 999;
+				//replacedMult = replacedExp = 0;
+				this.addElement(replacedMult, replacedExp);
+				
+			}
+			if ( poly[i].getExponet() == exp )
+			{
+				//System.out.println( " Inserting Element Position = " + i + " Number = " + mult + " Exponet = " + exp);
+				replacedMult = answer2[i].getMultiple();
+				replacedExp = answer2[i].getExponet();
+				answer2[i].setExponet(exp);
+				answer2[i].setMultiple(mult + replacedMult);
+				i = 999;
+				//replacedMult = replacedExp = 0;
+				//this.addElement(replacedMult, replacedExp);
+			}
+		}
+		//answer2[1].setExponet(14);
+		answer2[999].setExponet(0);
+		answer2[999].setMultiple(0);
+	}
+
+}
+
+

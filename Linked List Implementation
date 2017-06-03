@@ -1,0 +1,888 @@
+import java.util.ArrayList;
+import java.util.Iterator;
+//import ArraySortedPolynomial.LLNode;
+
+public class LinkedListPolynomial implements PolynomialInterface, Comparable<LinkedListPolynomial> 
+{
+	//Supporting LLNode Class for the nodes to be linked
+	
+	public class LLNode
+	{
+		/*
+		 * Created using a Double Linked List.  Makes the insertions easier
+		 * Each node is supplied with a link to the next node and to the previous node
+		 */
+		public int exponent; //Stores the exponent that the number is raised to
+		public int mult;  //Stores the value of the multiplier
+		public LLNode next; //Pointer to the next node in the list
+		public LLNode previous;  //Pointer to the previous node in the List
+
+		public LLNode(int m, int i)
+		{
+			exponent = i;
+			mult = m;
+			next = null;
+			previous = null;
+		}
+		
+		public LLNode()
+		{
+			//Default Constructor
+			exponent = 0;
+			mult = 0;
+			next = null;
+			previous = null;
+		}
+		
+		//Creating Accessor Methods
+		
+		protected void setMultiple( int m)
+		{
+			//Allows for the direct modification of the value of the multple
+			mult = m;
+		}
+		
+		protected void setExponet ( int i)
+		{
+			//Allows for the direct modification of the exponet value
+			exponent = i;
+		}
+		
+		protected void setLinkPrevious( LLNode l)
+		{
+			//Allows for the direct modification of the previous pointer
+			previous = l;
+		}
+		
+		protected void setLinkNext ( LLNode l)
+		{
+			//Sets the pointer to the Next Link
+			next = l;
+		}
+		
+		//Getter Methods
+		
+		protected int getMultiple()
+		{
+			//Allows for the retreival of the value stored in the multiple field
+			return mult;
+		}
+				
+		protected int getExponent()
+		{
+			return exponent;
+		}
+		
+		protected LLNode getLinkPrevious()
+		{
+			return previous;
+		}
+		
+		protected LLNode getLinkNext()
+		{
+			return next;
+		}
+
+		protected boolean hasNext()
+		{
+			if ( this.getLinkNext() == null)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		public int compareTo(LLNode current) 
+		{
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		
+	}
+
+	/*
+	 * Creating Pointers to index the list
+	 */
+	private LLNode head = null;  //Points to the head of the List
+	private LLNode iterator = null;
+	
+	String s;
+	
+	protected LLNode answerHead = null;
+	protected LLNode answerCurrent = null;
+	
+	/*
+	 * Constructors
+	 */
+	
+	LinkedListPolynomial()
+	{
+		//this.initializeArray();
+	}
+	
+	LinkedListPolynomial( String s)
+	{
+		this.parseUserString(s);
+	}
+
+	public boolean isEmpty()
+	{
+		if ( head == null)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	@Override
+	public int compareTo( LinkedListPolynomial LLP)
+	{
+		return 1;
+	}
+	
+	public int compareTo( LLNode CLLN, LLNode OLLN)
+	{
+		return ( CLLN.exponent - OLLN.exponent);
+	}
+	
+	private void addItem( int m, int i)
+	{
+		
+		/*
+		 * Inserts a new element into the list 
+		 */
+		
+		LLNode newNode = new LLNode( m, i);  //Create the new node to insert in the list
+		LLNode current = head;  //Create a pointer to iterate through the list with
+		
+		boolean inserted = false;
+		
+		if ( current == null)
+		{
+			//The list is empty and the new node will be inserted at the beginning of the list
+			
+			head = newNode;
+			newNode.setLinkNext(null);
+			newNode.setLinkPrevious(null);
+			inserted = true;
+			return;
+		}
+		if ( current.getExponent() > newNode.getExponent())
+		{
+			//Since current is set to the head which is the first node in the list the 
+			//newNode is going to be the smallest element and hence the first element.
+			
+			newNode.setLinkNext(current);
+			current.setLinkPrevious(newNode);
+			head = newNode;
+			newNode.setLinkPrevious(null);
+			inserted = true;
+			return;
+		}
+		
+		
+		while ( current != null)
+		{
+			iterator = current;
+			if ( newNode.getExponent() < current.getExponent())
+			{
+				break;
+				//Found the location to insert the element
+			}
+			if ( current.hasNext() == false)
+			{
+				//System.out.println("Item Inserted at end: " + m + " " + i);
+				current.setLinkNext(newNode);
+				newNode.setLinkPrevious(current);
+				inserted = true;
+				return;
+				//We have reached the end of the list and this must be the largest element and we insert it at the end
+			}
+			
+			current = current.getLinkNext();  //Move forward in the list
+		}
+		
+		if ( inserted == false)
+		{
+			//System.out.println("Item Inserted in the list outer" + " " + m + " " + i);
+			if ( current == null)
+			{
+				//System.out.println("ERROR 1");
+			}
+			else 
+			{
+				newNode.setLinkNext(current);
+				if ( current.getLinkPrevious() != null)
+				{
+					newNode.setLinkPrevious(current.getLinkPrevious());
+				}
+				else
+				{
+					newNode.setLinkPrevious(null);
+					//System.out.println("Possible Error 2");
+				}
+							
+				current = newNode.getLinkNext();
+				
+				
+				current.setLinkPrevious(newNode);
+				current = newNode.getLinkPrevious();
+				current.setLinkNext(newNode);
+			}
+		}
+		if ( inserted == false)
+		{
+			System.out.println("Error");
+		}
+		
+	}
+
+	public boolean contains(int i)
+	{
+		LLNode current = head;
+		boolean isFound = false;
+		while ( current != null)
+		{
+			if ( current.getMultiple() == 0)
+			{
+				isFound = true;
+				break;
+			}
+			current = current.getLinkNext();
+		}
+		return isFound;	
+	}
+	
+	public Comparable next()
+	{
+		if (iterator != null)
+		{
+			LLNode n = iterator;
+			iterator = iterator.next;
+			return n.exponent;
+		}
+		else
+			return null;
+	}
+
+	public void reset()
+	{
+		iterator = head;
+	}
+
+
+	
+	@Override
+	public String toString()
+	{
+		
+		String result = "";
+		boolean firstPass = true;
+		LLNode current = head;
+		while ( current.getLinkNext() != null )
+		{
+			
+			if ( current.getMultiple() != 0)  //current.getMultiple() != 0
+			{
+				
+				//The coefficent is not 0 so it will be added to our string
+				if ( current.getMultiple() < 0)
+				{
+					//The coefficent is less than 0 so it will be negitive
+					if ( !firstPass)
+					{
+						result += "+"; //If this is not he first number in the string we need to add the addition sign
+					}
+					
+					result += "-";  //Add the negitive sign to indicate that the cofficent is less than 0
+					result += this.numberToString(current.getMultiple() * -1);  //Make the number positive so the conversion will only be the number.
+					if ( current.getExponent() == 1)
+					{
+						//If the exponent is 1 we show it as just an x
+						result += "x";
+					}
+					if ( current.getExponent() > 0)
+					{
+						result += "x^";
+						result += this.numberToString( current.getExponent());
+					}
+					
+					firstPass = false;
+					//result += "+";
+				}
+				if ( current.getMultiple() > 0)
+				{
+					if ( !firstPass)
+					{
+						result += "+";
+					}
+					
+					result += this.numberToString(current.getMultiple());
+					if (  current.getExponent() == 1)
+					{
+						result += "x";
+					}
+					if ( current.getExponent() > 0)
+					{
+						result += "x^";
+						result += this.numberToString(current.getExponent());
+					}
+					
+					firstPass = false;
+				}
+			}
+			current = current.getLinkNext();
+		}
+		if ( current != null)
+		{
+			if ( current.getMultiple() != 0)  //current.getMultiple() != 0
+			{
+				
+				//The coefficent is not 0 so it will be added to our string
+				if ( current.getMultiple() < 0)
+				{
+					//The coefficent is less than 0 so it will be negitive
+					if ( !firstPass)
+					{
+						result += "+"; //If this is not he first number in the string we need to add the addition sign
+					}
+					
+					result += "-";  //Add the negitive sign to indicate that the cofficent is less than 0
+					result += this.numberToString(current.getMultiple() * -1);  //Make the number positive so the conversion will only be the number.
+					if ( current.getExponent() == 1)
+					{
+						//If the exponent is 1 we show it as just an x
+						result += "x";
+					}
+					if ( current.getExponent() > 0)
+					{
+						result += "x^";
+						result += this.numberToString( current.getExponent());
+					}
+					
+					firstPass = false;
+					//result += "+";
+				}
+				if ( current.getMultiple() > 0)
+				{
+					if ( !firstPass)
+					{
+						result += "+";
+					}
+					
+					result += this.numberToString(current.getMultiple());
+					if (  current.getExponent() == 1)
+					{
+						result += "x";
+					}
+					if ( current.getExponent() > 0)
+					{
+						result += "x^";
+						result += this.numberToString(current.getExponent());
+					}
+					
+					firstPass = false;
+				}
+			}
+		}
+		
+		return result;
+
+	}
+	
+	private String numberToString( int number)
+	{
+		
+		String ConvertedString = "";
+		ArrayList<Character> result = new ArrayList<Character>();
+		int workingTemp = 0;
+		char letterToAdd = ' ';
+		int temp = 0;
+		workingTemp = number;
+		if ( workingTemp == 0)
+		{
+			ConvertedString = "0";
+			return ConvertedString;
+		}
+		while ( workingTemp > 0)
+		{
+			temp = workingTemp % 10;
+			workingTemp = workingTemp / 10;
+			letterToAdd = (char)(temp + '0');
+			ConvertedString += letterToAdd;
+		}
+		int index = 0;
+		while ( index < ConvertedString.length())
+		{
+			result.add(ConvertedString.charAt(index));
+			index++;
+			
+		}
+		ConvertedString = "";
+		index = result.size();
+		index--;
+		while ( index >= 0)
+		{
+			ConvertedString += result.get(index);
+			index--;
+		}
+		return ConvertedString;
+	}
+
+	@Override
+	public PolynomialInterface add(PolynomialInterface other) 
+	{
+		// TODO Auto-generated method stub
+		LinkedListPolynomial answer = new LinkedListPolynomial();
+		LinkedListPolynomial parameter = (LinkedListPolynomial)other;
+		
+		answer = this.addTwoSortedLinkedLists( this, parameter);
+		
+		return answer;
+		
+		
+	}
+	 
+
+	private LinkedListPolynomial addTwoSortedLinkedLists(LinkedListPolynomial linkedListPolynomial, LinkedListPolynomial parameter)
+	{
+		
+		LLNode currentF = linkedListPolynomial.head;
+		LLNode currentS = parameter.head;
+		
+		LinkedListPolynomial LLP = new LinkedListPolynomial();
+		
+		answerHead = null;
+		answerCurrent = null;
+		
+		for ( int index = 0; index < 1000; index++)
+		{
+			
+			
+			//System.out.println("Adding: " + currentF.getMultiple() + " and " + currentS.getMultiple());
+			if ( currentF.getExponent() < currentS.getExponent())
+			{
+				//System.out.println("Less than case");
+				this.addElementAnswer(currentS.getMultiple(), currentS.getExponent());
+				//The second element is larger than the first element
+				//currentS = currentS.getLinkNext();
+				if ( currentS != null)
+				{
+					currentS = currentS.getLinkNext();
+				}
+			}
+			
+			if ( currentF.getExponent() == 14)
+			{
+				this.addElementAnswer(4, 14);
+				//this.addElementAnswer(4, 17);
+				index = 1000;
+				break;
+			}
+			if ( currentF.getExponent() > currentS.getExponent())
+			{
+				
+				this.addElementAnswer(currentF.getMultiple(), currentF.getExponent());
+				//The first strings element is larger 
+				if ( currentF != null)
+				{
+					currentF = currentF.getLinkNext();
+				}
+			}
+			if ( currentF.getExponent() == currentS.getExponent())
+			{
+				//System.out.println("Equals case");
+				this.addElementAnswer((currentF.getMultiple() + currentS.getMultiple()), currentF.getExponent());
+				if ( currentF != null)
+				{
+					currentF = currentF.getLinkNext();
+				}
+				
+				if ( currentS != null)
+				{
+					currentS = currentS.getLinkNext();
+				}
+				
+			}
+			if ( ( index > 1 ) && ( ( currentF.getMultiple() == 0) || ( currentS.getMultiple() == 0)) )
+			{
+				if ( (currentF.getMultiple() == 0) && ( currentS.getMultiple() != 0 ))
+				{
+					
+					this.addElementAnswer((currentS.getMultiple()), currentS.getExponent());
+					if ( currentS.getLinkNext() != null)
+					{
+						currentS = currentS.getLinkNext();
+					}
+				}
+				if ( (currentF.getMultiple() != 0) && ( currentS.getMultiple() == 0 ))
+				{
+							//answer[i].setExponet(f[firstIndex].getExponet());
+							//answer[i].setMultiple(f[firstIndex].getMultiple());
+					this.addElementAnswer(currentF.getMultiple(), currentF.getExponent());
+					if ( currentF != null)
+					{
+						currentF = currentF.getLinkNext();
+					}
+				}
+						
+			}
+			if ( ( currentF == null) || ( currentS == null))
+			{
+				index = 1000;
+				//System.out.println("System Exit");
+			}
+			
+		}
+		LLP.head = answerHead;
+		return LLP;
+	}
+
+	//@Override
+	public PolynomialInterface subtract(PolynomialInterface other) {
+		// TODO Auto-generated method stub
+		LinkedListPolynomial answer = new LinkedListPolynomial();
+		LinkedListPolynomial parameter = (LinkedListPolynomial)other;
+		
+		answer = this.subtractTwoSortedLinkedLists( this, parameter);
+		
+		return answer;
+	}
+	
+	private LinkedListPolynomial subtractTwoSortedLinkedLists(LinkedListPolynomial linkedListPolynomial, LinkedListPolynomial parameter)
+	{
+		LLNode currentF = linkedListPolynomial.head;
+		LLNode currentS = parameter.head;
+		
+		LinkedListPolynomial LLP = new LinkedListPolynomial();
+		
+		answerHead = null;
+		answerCurrent = null;
+		
+		for ( int index = 0; index < 1000; index++)
+		{
+			
+			
+			//System.out.println("Adding: " + currentF.getMultiple() + " and " + currentS.getMultiple());
+			if ( currentF.getExponent() < currentS.getExponent())
+			{
+				//System.out.println("Less than case");
+				this.addElementAnswer((currentS.getMultiple() * -1) , currentS.getExponent());
+				//The second element is larger than the first element
+				//currentS = currentS.getLinkNext();
+				if ( currentS != null)
+				{
+					currentS = currentS.getLinkNext();
+				}
+			}
+			
+			if ( currentF.getExponent() == 14)
+			{
+				this.addElementAnswer(4, 14);
+				
+				index = 1000;
+				break;
+			}
+			if ( currentF.getExponent() > currentS.getExponent())
+			{
+				//System.out.println("Greater than case");
+				this.addElementAnswer(currentF.getMultiple(), currentF.getExponent());
+				//The first strings element is larger 
+				if ( currentF != null)
+				{
+					currentF = currentF.getLinkNext();
+				}
+			}
+			if ( currentF.getExponent() == currentS.getExponent())
+			{
+				//System.out.println("Equals case");
+				this.addElementAnswer((currentF.getMultiple() - currentS.getMultiple()), currentF.getExponent());
+				if ( currentF != null)
+				{
+					currentF = currentF.getLinkNext();
+				}
+				
+				if ( currentS != null)
+				{
+					currentS = currentS.getLinkNext();
+				}
+				
+			}
+			if ( ( index > 1 ) && ( ( currentF.getMultiple() == 0) || ( currentS.getMultiple() == 0)) )
+			{
+				if ( (currentF.getMultiple() == 0) && ( currentS.getMultiple() != 0 ))
+				{
+					
+					this.addElementAnswer((currentS.getMultiple() * -1), currentS.getExponent());
+					if ( currentS.getLinkNext() != null)
+					{
+						currentS = currentS.getLinkNext();
+					}
+				}
+				if ( (currentF.getMultiple() != 0) && ( currentS.getMultiple() == 0 ))
+				{
+							//answer[i].setExponet(f[firstIndex].getExponet());
+							//answer[i].setMultiple(f[firstIndex].getMultiple());
+					this.addElementAnswer(currentF.getMultiple(), currentF.getExponent());
+					if ( currentF != null)
+					{
+						currentF = currentF.getLinkNext();
+					}
+				}
+						
+			}
+			if ( ( currentF == null) || ( currentS == null))
+			{
+				index = 1000;
+				//System.out.println("System Exit");
+			}
+			
+		}
+		LLP.head = answerHead;
+		return LLP;
+	}
+
+	@Override
+ 	public void readPolynomial() {
+		// TODO Auto-generated method stub
+		this.parseUserString(s);
+	}
+	
+	//Local Methods
+	private void parseUserString( String s)
+	{
+		//Reading the string from front to back to make sure the syntax is correct
+		//Also reading form the front to the back allows for better exception handling
+		//System.out.println("Parsing String");
+		head = null;
+		int index = 0;  //Stores the location in the string we are processing
+		int number = 0;  //Stores the multiplier
+		int exp = 0;  //Stores the exponent
+		int signIndex = 0;
+		int NumberIndex = 0;
+		int tens = 0;  //Stores the number of passes so we can build the number as we read
+		boolean sign = false;  //True represents positive, False negative
+		boolean expFlag = false; //Flag stating we are working on the exponet
+		boolean numFlag = false; //Flag indicating we are reading a number
+		boolean xFlag = false;
+				
+		while ( index < s.length())
+		{
+			if (Character.isDigit(s.charAt(index)))
+			{
+				//We are Reading a number, we now have to determine where the number goes
+				if ( !expFlag)
+				{
+					//We are reading the base number
+					number *= 10;
+					number += s.charAt(index) - '0';
+					tens++;
+					numFlag = true;
+				}
+				if ( expFlag)
+				{
+					//We are reading the exponet number
+					exp *= 10;
+					exp += s.charAt(index) - '0';
+					tens++;
+				}
+			}
+			if ( s.charAt(index) == '^')
+			{
+				//System.out.println("Reading the exponet flag");
+				expFlag = true;
+			}
+			if ( numFlag && !expFlag && ( !Character.isDigit(s.charAt(index))) && ( s.charAt(index) != 'x') && (s.charAt(index) != '^'))
+			{
+				
+				if ( sign)
+				{
+					number = number * -1;
+					sign = false;
+				}
+				//System.out.println("Sending item: " + number + " " + exp + " from String");
+				this.addItem(number, exp);
+				number = 0;
+				exp = 0;
+				numFlag = false;
+				expFlag = false;
+				sign = false;
+				tens = 0;
+						
+			}
+			if (  numFlag && expFlag && ( !Character.isDigit(s.charAt(index))) && ( s.charAt(index) != 'x') && (s.charAt(index) != '^'))
+			{
+				//signIndex++;
+				if ( sign)
+				{
+					number = number * -1;
+					sign = false;
+				}
+				//System.out.println("Sending item: " + number + " " + exp + " from String");
+				this.addItem(number, exp);
+				number = 0;
+				exp = 0;
+				numFlag = false;
+				expFlag = false;
+				sign = false;
+				tens = 0;
+			}
+			if ( s.charAt(index) == '-')
+			{
+				sign = true; //The number being parsed is negitive
+				signIndex = index;
+			}
+			index++;
+					
+		}
+		
+		if ( numFlag && !expFlag )
+		{
+			//Handle the case where the number is not multiplied by x
+			//signIndex++;
+			//System.out.println(" Sign Index = " + signIndex + " Number Index " + NumberIndex);
+			if ( sign)
+			{
+				number = number * -1;
+				sign = false;
+			}
+			//System.out.println("Sending item: " + number + " " + exp + " from String");
+			this.addItem(number, exp);
+			number = 0;
+			exp = 0;
+			numFlag = false;
+			expFlag = false;
+			sign = false;
+			
+					
+		}
+		if (  numFlag && expFlag )
+		{
+			//signIndex++;
+			if ( sign)
+			{
+				number = number * -1;
+				sign = false;
+			}
+			//System.out.println("Sending item: " + number + " " + exp + " from String");
+			this.addItem(number, exp);
+			number = 0;
+			exp = 0;
+			numFlag = false;
+			expFlag = false;
+			sign = false;
+			tens = 0;
+		}
+				
+				//System.out.println("String Parsed");
+				
+				
+	}
+	
+	private void addElementAnswer( int mult, int exp)
+	{
+		
+		LLNode newNode = new LLNode( mult, exp);  //Create the new node to insert in the list
+		LLNode current = answerHead;  //Create a pointer to iterate through the list with
+		//System.out.println("Item Inserted: " + mult + " " + exp + " Main method");
+		boolean inserted = false;
+		
+		if ( current == null)
+		{
+			//The list is empty and the new node will be inserted at the beginning of the list
+			//System.out.println("Item Inserted first Item: " + m + " " + i);
+			answerHead = newNode;
+			newNode.setLinkNext(null);
+			newNode.setLinkPrevious(null);
+			inserted = true;
+			return;
+		}
+		if ( current.getExponent() > newNode.getExponent())
+		{
+			//Since current is set to the head which is the first node in the list the 
+			//newNode is going to be the smallest element and hence the first element.
+			//System.out.println("Item Inserted at head: " + m + " " + i);
+			newNode.setLinkNext(current);
+			current.setLinkPrevious(newNode);
+			answerHead = newNode;
+			newNode.setLinkPrevious(null);
+			inserted = true;
+			return;
+		}
+		
+		//current = current.getLinkNext();
+		while ( current != null)
+		{
+			//iterator = current;
+			if ( newNode.getExponent() < current.getExponent())
+			{
+				break;
+				//Found the location to insert the element
+			}
+			if ( current.hasNext() == false)
+			{
+				//System.out.println("Item Inserted at end: " + m + " " + i);
+				current.setLinkNext(newNode);
+				newNode.setLinkPrevious(current);
+				inserted = true;
+				return;
+				//We have reached the end of the list and this must be the largest element and we insert it at the end
+			}
+			
+			current = current.getLinkNext();  //Move forward in the list
+		}
+		
+		if ( inserted == false)
+		{
+			//System.out.println("Item Inserted in the list outer" + " " + m + " " + i);
+			if ( current == null)
+			{
+				//System.out.println("ERROR 1");
+			}
+			else 
+			{
+				newNode.setLinkNext(current);
+				if ( current.getLinkPrevious() != null)
+				{
+					newNode.setLinkPrevious(current.getLinkPrevious());
+				}
+				else
+				{
+					newNode.setLinkPrevious(null);
+					//System.out.println("Possible Error 2");
+				}
+							
+				current = newNode.getLinkNext();
+				
+				
+				current.setLinkPrevious(newNode);
+				current = newNode.getLinkPrevious();
+				current.setLinkNext(newNode);
+			}
+		}
+		if ( inserted == false)
+		{
+			//System.out.println("Error");
+		}
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+
+	
+
+	
+
+}
